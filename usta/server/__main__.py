@@ -5,7 +5,7 @@ import os
 import os.path
 
 
-from flask import Flask, request, jsonify
+from flask import Flask, request
 from werkzeug import secure_filename
 
 
@@ -48,7 +48,7 @@ def main():
 
         return True
 
-    @app.route('/upload', methods=['POST', ])
+    @app.route('/upload', methods=['POST'])
     def upload():
         if request.method == 'POST':
                 _file = request.files['file']
