@@ -2,15 +2,17 @@
 import argparse
 import json
 import os
-from functools import wraps
+import os.path
 
 
-from flask import Flask, Response, request
+from flask import Flask, request, jsonify
+from werkzeug import secure_filename
 
 
 def get_app(usta_config):
     app = Flask(__name__)
     app.config['MAX_CONTENT_LENGTH'] = usta_config.get("MAX_UPLOAD_LIMIT")
+    app.config['UPLOAD_FOLDER'] = usta_config["UPLOAD_FOLDER"]
 
     return app
 
@@ -38,10 +40,24 @@ def main():
 
     app = get_app(config)
 
-    @app.route('/upload')
-    def upload():
-        return "there will be a upload handler here."
+    def allowed_file(filename):
+        allowed_extensions = config.get("ALLOWED_EXTENSIONS")
+        if allowed_extensions:
+            return '.' in filename and \
+                   filename.rsplit('.', 1)[1] in allowed_extensions
 
+        return True
+
+    @app.route('/upload', methods=['POST', ])
+    def upload():
+        if request.method == 'POST':
+                _file = request.files['file']
+                if _file and allowed_file(_file.filename):
+                    filename = secure_filename(_file.filename)
+                    _file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                    return '', 201
+
+    app.debug = True
     app.run(
         config.get("HOST"),
         int(config.get("PORT")),

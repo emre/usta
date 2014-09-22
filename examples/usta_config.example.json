@@ -1,5 +1,8 @@
 {
     "MAX_UPLOAD_LIMIT": 1073741824,
+    "SECRET_KEY": "nrvnfa@r@5j(eee95p8a1h#_jdhcujoqqjb=-7pqcs#ki7*aiq",
     "HOST": "0.0.0.0",
-    "PORT": "5005"
+    "PORT": "5005",
+    "UPLOAD_FOLDER": "/users/emre/uploads",
+    "ALLOWED_EXTENSIONS": ["txt", "pdf", "png", "jpg", "jpeg", "gif", "doc", "xls", "docx"]
 }
