@@ -3,6 +3,7 @@ import argparse
 import json
 import os
 import os.path
+import itertools
 
 
 from flask import Flask, request
@@ -54,6 +55,22 @@ def main():
         # if the config doesn't have a ALLOWED_EXTENSIONS section.
         return True
 
+    def get_available_filename(filename):
+        dir_name, file_name = os.path.split(filename)
+        file_root, file_ext = os.path.splitext(filename)
+
+        # if the filename already exists, add an underscore and a number (before
+        # the file extension, if one exists) to the filename until the generated
+        # filename doesn't exist.
+        counter = itertools.count(1)
+        while os.path.exists(filename):
+            counter_state = next(counter)
+            if counter_state > 10:
+                raise ValueError("counter limit exceeded for this filename. try renaming it.")
+            filename = os.path.join(dir_name, "%s_%s%s" % (file_root, counter_state, file_ext))
+
+        return filename
+
     @app.route('/upload', methods=['POST'])
     def upload():
         _file = request.files.get("file")
@@ -64,7 +81,18 @@ def main():
             return "invalid file type", 400
 
         filename = secure_filename(_file.filename)
-        _file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        full_filename = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+
+        if os.path.exists(full_filename):
+
+            try:
+                full_filename = get_available_filename(full_filename)
+            except ValueError as error:
+                return error.message, 400
+
+        print "saving to {}".format(full_filename)
+        _file.save(full_filename)
+
         return '', 201
 
     app.debug = True
