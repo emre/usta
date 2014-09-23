@@ -6,7 +6,7 @@ import itertools
 from flask import Flask, request, Response
 from werkzeug import secure_filename
 
-from utils import get_config, get_cli_arguments, authenticate
+from utils import (get_config, get_cli_arguments, check_auth, allowed_file, get_available_filename)
 
 
 def get_app(usta_config):
@@ -23,37 +23,6 @@ def main():
     config = get_config(args.config)
     app = get_app(config)
 
-    def allowed_file(filename):
-        allowed_extensions = config.get("ALLOWED_EXTENSIONS")
-        if allowed_extensions:
-            return '.' in filename and \
-                   filename.rsplit('.', 1)[1] in allowed_extensions
-
-        # suppose all file formats are okay to upload
-        # if the config doesn't have a ALLOWED_EXTENSIONS section.
-        return True
-
-    def get_available_filename(filename):
-        dir_name, file_name = os.path.split(filename)
-        file_root, file_ext = os.path.splitext(filename)
-
-        # if the filename already exists, add an underscore and a number (before
-        # the file extension, if one exists) to the filename until the generated
-        # filename doesn't exist.
-        counter = itertools.count(1)
-        while os.path.exists(filename):
-            counter_state = next(counter)
-            if counter_state > 10:
-                raise ValueError("counter limit exceeded for this filename. try renaming it.")
-            filename = os.path.join(dir_name, "%s_%s%s" % (file_root, counter_state, file_ext))
-
-        return filename
-
-    def check_auth(config):
-        auth = request.authorization
-        if not auth or (auth.username != config["client"]["user"] or auth.password != config["client"]["pass"]):
-            return authenticate()
-
 
     @app.route('/upload/', methods=['POST', 'GET'])
     def upload():
@@ -67,7 +36,7 @@ def main():
         if not _file:
             return "a file named as 'file' required", 400
 
-        if not allowed_file(_file.filename):
+        if not allowed_file(_file.filename, config):
             return "invalid file type", 400
 
         filename = secure_filename(_file.filename)
@@ -80,7 +49,7 @@ def main():
 
         _file.save(full_filename)
 
-        return _file.filename, 201
+        return os.path.split(full_filename)[1], 201
 
     app.debug = True
     app.run(
