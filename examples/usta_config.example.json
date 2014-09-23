@@ -3,5 +3,8 @@
     "HOST": "0.0.0.0",
     "PORT": "5005",
     "UPLOAD_FOLDER": "/users/emre/uploads",
-    "ALLOWED_EXTENSIONS": ["txt", "pdf", "png", "jpg", "jpeg", "gif", "doc", "xls", "docx"]
+    "ALLOWED_EXTENSIONS": ["txt", "pdf", "png", "jpg", "jpeg", "gif", "doc", "xls", "docx"],
+    "CLIENT": {
+        "endpoint": "http://localhost:5005",
+    }
 }

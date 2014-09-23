@@ -1,6 +1,5 @@
 
 import argparse
-import json
 import os
 import os.path
 import itertools
@@ -8,6 +7,8 @@ import itertools
 
 from flask import Flask, request
 from werkzeug import secure_filename
+
+from utils import get_config, get_cli_arguments
 
 
 def get_app(usta_config):
@@ -18,31 +19,10 @@ def get_app(usta_config):
     return app
 
 
-def get_config(filename):
-
-    if not filename:
-        filename = os.path.expanduser("~/.usta.config")
-
-    if not os.path.exists(filename):
-        raise LookupError("config file doesn't exists. {}".format(filename))
-
-    with open(filename) as file_handle:
-        config_data = json.loads(file_handle.read())
-
-    return config_data
-
-
 def main():
 
-    parser = argparse.ArgumentParser(
-        epilog='usta is a simple file server for personal use.'
-    )
-
-    parser.add_argument("-c", "--config", help="config file")
-    args = parser.parse_args()
-
+    args = get_cli_arguments()
     config = get_config(args.config)
-
     app = get_app(config)
 
     def allowed_file(filename):
@@ -71,7 +51,7 @@ def main():
 
         return filename
 
-    @app.route('/upload', methods=['POST'])
+    @app.route('/upload/', methods=['POST'])
     def upload():
         _file = request.files.get("file")
         if not _file:
