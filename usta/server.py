@@ -5,7 +5,7 @@ import os
 import os.path
 
 
-from flask import Flask, request, jsonify
+from flask import Flask, request
 from werkzeug import secure_filename
 
 
@@ -54,10 +54,10 @@ def main():
     def upload():
         _file = request.files.get("file")
         if not _file:
-            return jsonify({"message": "a file named as 'file' required."}), 400
+            return "a file named as 'file' required", 400
 
         if not allowed_file(_file.filename):
-            return jsonify({"message": "invalid file type."}), 400
+            return "invalid file type", 400
 
         filename = secure_filename(_file.filename)
         _file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
