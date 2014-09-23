@@ -47,7 +47,7 @@ def main():
                    filename.rsplit('.', 1)[1] in allowed_extensions
 
         # suppose all file formats are okay to upload
-        # if the config doesn't exists a ALLOWED_EXTENSIONS section.
+        # if the config doesn't have a ALLOWED_EXTENSIONS section.
         return True
 
     @app.route('/upload', methods=['POST'])
