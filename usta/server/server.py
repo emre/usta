@@ -50,12 +50,11 @@ def main():
 
     @app.route('/upload', methods=['POST'])
     def upload():
-        if request.method == 'POST':
-                _file = request.files['file']
-                if _file and allowed_file(_file.filename):
-                    filename = secure_filename(_file.filename)
-                    _file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                    return '', 201
+        _file = request.files['file']
+        if _file and allowed_file(_file.filename):
+            filename = secure_filename(_file.filename)
+            _file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            return '', 201
 
     app.debug = True
     app.run(
