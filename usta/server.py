@@ -84,13 +84,11 @@ def main():
         full_filename = os.path.join(app.config['UPLOAD_FOLDER'], filename)
 
         if os.path.exists(full_filename):
-
             try:
                 full_filename = get_available_filename(full_filename)
             except ValueError as error:
                 return error.message, 400
 
-        print "saving to {}".format(full_filename)
         _file.save(full_filename)
 
         return '', 201
