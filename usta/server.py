@@ -1,14 +1,12 @@
 
-import argparse
 import os
 import os.path
 import itertools
 
-
-from flask import Flask, request
+from flask import Flask, request, Response
 from werkzeug import secure_filename
 
-from utils import get_config, get_cli_arguments
+from utils import get_config, get_cli_arguments, authenticate
 
 
 def get_app(usta_config):
@@ -51,8 +49,20 @@ def main():
 
         return filename
 
-    @app.route('/upload/', methods=['POST'])
+    def check_auth(config):
+        auth = request.authorization
+        if not auth or (auth.username != config["client"]["user"] or auth.password != config["client"]["pass"]):
+            return authenticate()
+
+
+    @app.route('/upload/', methods=['POST', 'GET'])
     def upload():
+
+        if 'client' in config and 'user' in config["client"] and 'pass' in config["client"]:
+            auth_control = check_auth(config)
+            if auth_control:
+                return auth_control
+
         _file = request.files.get("file")
         if not _file:
             return "a file named as 'file' required", 400
@@ -70,7 +80,7 @@ def main():
 
         _file.save(full_filename)
 
-        return '', 201
+        return _file.filename, 201
 
     app.debug = True
     app.run(

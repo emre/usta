@@ -1,9 +1,11 @@
-
+from __future__ import print_function
 
 import os.path
 import sys
 
+
 import requests
+import requests.auth
 
 from utils import get_config, get_cli_arguments
 
@@ -20,20 +22,25 @@ def main():
 
     request_parameters = {}
 
-    if 'username' in config.get("client") and 'password' in config.get("client"):
+    if 'user' in config.get("client") and 'pass' in config.get("client"):
         request_parameters.update({
-            "auth": (config["client"]["username"], config["client"]["password"]),
+            "auth": requests.auth.HTTPBasicAuth(config["client"]["user"], config["client"]["pass"]),
         })
 
     with open(args.file, 'r') as payload:
         request_parameters.update({
             "files": {"file": payload},
         })
+        try:
+            r = requests.post(config["client"]["endpoint"], **request_parameters)
+        except requests.exceptions.ConnectionError:
+            # @todo: how exactly requests library seperate requests with bad auth and requests with bad url?
+            sys.exit("invalid URL or invalid credentials.")
 
-        r = requests.post(config["client"]["endpoint"], **request_parameters)
-
-        print r.status_code
-
+        if r.status_code == 201:
+            print("file successfully uploaded. {}{}".format(config.get("SERVE_URL"), r.content))
+        else:
+            print("error: {}".format(r.content), file=sys.stderr)
 
 if __name__ == '__main__':
     main()

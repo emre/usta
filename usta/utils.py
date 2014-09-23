@@ -3,6 +3,10 @@ import os.path
 import argparse
 
 
+from functools import wraps
+from flask import request, Response
+
+
 def get_config(filename):
 
     if not filename:
@@ -30,3 +34,11 @@ def get_cli_arguments(for_client=False):
     args = parser.parse_args()
 
     return args
+
+
+def authenticate():
+    return Response(
+        'you have to login with proper credentials.',
+        401,
+        {'WWW-Authenticate': 'Basic realm="login required"'}
+    )
