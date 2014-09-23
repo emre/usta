@@ -19,10 +19,14 @@ def get_app(usta_config):
 
 def get_config(filename):
 
-    if not os.path.exists(filename):
-        raise LookupError("invalid filename for config. {}".format(filename))
+    if not filename:
+        filename = os.path.expanduser("~/.usta.config")
 
-    config_data = json.loads(open(filename).read())
+    if not os.path.exists(filename):
+        raise LookupError("config file doesn't exists. {}".format(filename))
+
+    with open(filename) as file_handle:
+        config_data = json.loads(file_handle.read())
 
     return config_data
 
@@ -33,7 +37,7 @@ def main():
         epilog='usta is a simple file server for personal use.'
     )
 
-    parser.add_argument("-c", "--config", help="config file", required=True)
+    parser.add_argument("-c", "--config", help="config file")
     args = parser.parse_args()
 
     config = get_config(args.config)
