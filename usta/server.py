@@ -24,7 +24,7 @@ def main():
     app = get_app(config)
 
 
-    @app.route('/upload/', methods=['POST', 'GET'])
+    @app.route('/upload/', methods=['POST'])
     def upload():
 
         if 'client' in config and 'user' in config["client"] and 'pass' in config["client"]:
