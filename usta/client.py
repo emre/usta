@@ -1,4 +1,3 @@
-from __future__ import print_function
 
 import os.path
 import sys
@@ -38,9 +37,9 @@ def main():
             sys.exit("invalid URL or invalid credentials.")
 
         if r.status_code == 201:
-            print("file successfully uploaded. {}{}".format(config.get("SERVE_URL"), r.content))
+            print "file successfully uploaded. {}{}".format(config.get("SERVE_URL"), r.content)
         else:
-            print("error: {}".format(r.content), file=sys.stderr)
+            sys.exit("error: {}".format(r.content))
 
 if __name__ == '__main__':
     main()
