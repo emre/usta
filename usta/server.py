@@ -1,9 +1,8 @@
 
 import os
 import os.path
-import itertools
 
-from flask import Flask, request, Response
+from flask import Flask, request
 from werkzeug import secure_filename
 
 from utils import (get_config, get_cli_arguments, check_auth, allowed_file, get_available_filename)
