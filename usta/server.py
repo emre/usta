@@ -4,8 +4,10 @@ import os.path
 
 from flask import Flask, request
 from werkzeug import secure_filename
+from clint.textui import puts, indent, colored
+from gevent.wsgi import WSGIServer
 
-from utils import (get_config, get_cli_arguments, check_auth, allowed_file, get_available_filename)
+from utils import (get_config, get_cli_arguments, check_auth, allowed_file, get_available_filename, get_config_filename)
 
 
 def get_app(usta_config):
@@ -51,10 +53,13 @@ def main():
         return os.path.split(full_filename)[1], 201
 
     app.debug = True
-    app.run(
-        config.get("HOST"),
-        int(config.get("PORT")),
-    )
+
+    with indent(2):
+        puts("{} starting at {}:{}".format(colored.magenta("server "), config.get("HOST"), config.get("PORT")))
+        puts("{} {}".format(colored.green("config"), get_config_filename(args.config)))
+
+    http_server = WSGIServer(('', int(config.get("PORT"))), app)
+    http_server.serve_forever()
 
 
 if __name__ == '__main__':

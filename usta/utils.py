@@ -6,13 +6,20 @@ import itertools
 from flask import request, Response
 
 
-def get_config(filename):
+def get_config_filename(filename):
 
     if not filename:
         filename = os.path.expanduser("~/.usta.config")
 
     if not os.path.exists(filename):
         raise LookupError("config file doesn't exists. {}".format(filename))
+
+    return filename
+
+
+def get_config(filename):
+
+    filename = get_config_filename(filename)
 
     with open(filename) as file_handle:
         config_data = json.loads(file_handle.read())
