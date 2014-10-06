@@ -55,7 +55,7 @@ def main():
     app.debug = True
 
     with indent(2):
-        puts("{} starting at {}:{}".format(colored.magenta("server "), config.get("HOST"), config.get("PORT")))
+        puts("{} starting at {}:{}".format(colored.magenta("server"), config.get("HOST"), config.get("PORT")))
         puts("{} {}".format(colored.green("config"), get_config_filename(args.config)))
 
     http_server = WSGIServer(('', int(config.get("PORT"))), app)
